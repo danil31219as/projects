@@ -1,0 +1,30 @@
+{% extends "start.html" %}
+
+{% block content_table %}
+
+        {% for user in users%}
+
+<table class="table">
+
+            <h2>Action # {{ loop.index }}</h2>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    {% for c in char %}
+                        <th>{{ c }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"></th>
+                    {% for elem in user %}
+                        <td>{{ elem }}</td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+
+        </table>
+        {% endfor %}
+
+{% endblock %}
