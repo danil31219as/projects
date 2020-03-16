@@ -1,5 +1,5 @@
 import flask
-from flask import jsonify
+from flask import jsonify, make_response
 
 from data import db_session
 from data.jobs import Jobs
@@ -21,3 +21,8 @@ def get_news():
                  for item in jobs]
         }
     )
+
+
+@blueprint.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
