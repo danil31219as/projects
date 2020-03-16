@@ -1,7 +1,8 @@
 import datetime
 
-from flask import Flask
-from data import db_session
+import flask
+from flask import Flask, jsonify, make_response
+from data import db_session, jobs_api
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from data.users import User
 from flask import render_template
@@ -16,10 +17,19 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 u_i = 1
+blueprint = flask.Blueprint('jobs_api', __name__,
+                            template_folder='templates')
 
 
 def main():
     db_session.global_init("db/blogs.sqlite")
+    app.register_blueprint(jobs_api.blueprint)
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return make_response(jsonify({'error': 'Not found'}), 404)
+
+    app.run()
 
 
 @login_manager.user_loader
