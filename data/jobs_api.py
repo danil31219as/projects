@@ -9,7 +9,7 @@ blueprint = flask.Blueprint('jobs_api', __name__,
 
 
 @blueprint.route('/api/jobs')
-def get_news():
+def get_jobs():
     session = db_session.create_session()
     jobs = session.query(Jobs).all()
     return jsonify(
@@ -24,7 +24,7 @@ def get_news():
 
 
 @blueprint.route('/api/jobs/<int:team_leader>', methods=['GET'])
-def get_news(team_leader):
+def get_jobs(team_leader):
     session = db_session.create_session()
     jobs = session.query(Jobs).get(team_leader)
     return jsonify(

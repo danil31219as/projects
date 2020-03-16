@@ -2,6 +2,8 @@ import datetime
 
 import flask
 from flask import Flask, jsonify, make_response
+from flask_restful import Api
+
 from data import db_session, jobs_api
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from data.users import User
@@ -14,6 +16,7 @@ from data.jobs import Jobs
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 u_i = 1
@@ -107,11 +110,13 @@ def add_job():
         session = db_session.create_session()
         if str(u_i) == str(form.team_leader_id.data):
             job = Jobs()
-            job.title_of_activity = form.job_title.data
+            job.job = form.job_title.data
             job.team_leader = form.team_leader_id.data
-            job.duration = form.work_size.data
-            job.list_of_collaborators = form.collaborators.data
+            job.work_size = form.work_size.data
+            job.collaborators = form.collaborators.data
             job.is_finished = form.is_finished.data
+            job.start_date = datetime.datetime.now()
+            job.end_date = datetime.datetime.now()
             session.add(job)
             session.commit()
             return redirect("/")
