@@ -20,8 +20,6 @@ api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 u_i = 1
-blueprint = flask.Blueprint('jobs_api', __name__,
-                            template_folder='templates')
 
 
 def main():
@@ -133,11 +131,11 @@ def get_params(search):
     session = db_session.create_session()
     for job in search:
         user_list = []
-        user_list.append(job.title_of_activity)
+        user_list.append(job.job)
         user = session.query(User).filter(User.id == job.team_leader).first()
         user_list.append(user.name)
-        user_list.append(job.duration)
-        user_list.append(job.list_of_collaborators)
+        user_list.append(job.work_size)
+        user_list.append(job.collaborators)
         user_list.append(
             'is finished' if job.is_finished else 'is not finished')
         param['users'].append(user_list)

@@ -16,15 +16,15 @@ def get_jobs():
         {
             'jobs':
                 [item.to_dict(only=(
-                    'id', 'team_leader', 'title_of_activity', 'duration',
-                    'list_of_collaborators', 'is_finished'))
+                    'id', 'team_leader', 'job', 'work_size',
+                    'collaborators', 'start_date', 'end_date', 'is_finished'))
                     for item in jobs]
         }
     )
 
 
 @blueprint.route('/api/jobs/<int:team_leader>', methods=['GET'])
-def get_jobs(team_leader):
+def get_one_jobs(team_leader):
     session = db_session.create_session()
     jobs = session.query(Jobs).get(team_leader)
     return jsonify(
