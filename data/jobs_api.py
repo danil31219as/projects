@@ -31,15 +31,15 @@ def get_one_jobs(team_leader):
         {
             'jobs':
                 [item.to_dict(only=(
-                    'id', 'team_leader', 'title_of_activity', 'duration',
-                    'list_of_collaborators', 'is_finished'))
+                    'id', 'team_leader', 'job', 'work_size',
+                    'collaborators', 'start_date', 'end_date', 'is_finished'))
                     for item in jobs]
         }
     )
 
 
 @blueprint.route('/api/jobs', methods=['POST'])
-def create_news():
+def create_jobs():
     session = db_session.create_session()
     if not request.json:
         return jsonify({'error': 'Empty request'})

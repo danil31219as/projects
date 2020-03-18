@@ -1,11 +1,12 @@
 import datetime
 
 import flask
-from flask import Flask, jsonify, make_response
-from flask_restful import Api
+from flask import Flask, jsonify, make_response, request
+from flask_restful import Api, abort
 
 from data import db_session, jobs_api
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required, \
+    current_user
 from data.users import User
 from flask import render_template
 from data.login_form import LoginForm
@@ -19,7 +20,6 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-u_i = 1
 
 
 def main():
@@ -35,9 +35,7 @@ def main():
 
 @login_manager.user_loader
 def load_user(user_id):
-    global u_i
     session = db_session.create_session()
-    u_i = user_id
     return session.query(User).get(user_id)
 
 
@@ -106,10 +104,10 @@ def add_job():
     form = JobForm()
     if form.validate_on_submit():
         session = db_session.create_session()
-        if str(u_i) == str(form.team_leader_id.data):
+        if str(current_user.id) == str(form.team_leader.data):
             job = Jobs()
-            job.job = form.job_title.data
-            job.team_leader = form.team_leader_id.data
+            job.job = form.job.data
+            job.team_leader = form.team_leader.data
             job.work_size = form.work_size.data
             job.collaborators = form.collaborators.data
             job.is_finished = form.is_finished.data
@@ -120,9 +118,10 @@ def add_job():
             return redirect("/")
         return render_template('add_job.html',
                                message="нет доступа",
-                               form=form)
-    return render_template('add_job.html', title='Добавление', form=form,
-                           text='Наше приложение')
+                               form=form, name='Добавление')
+    return render_template('add_job.html', title='Добавление работы',
+                           form=form,
+                           text='Наше приложение', name='Добавление')
 
 
 def get_params(search):
@@ -140,6 +139,44 @@ def get_params(search):
             'is finished' if job.is_finished else 'is not finished')
         param['users'].append(user_list)
     return param
+
+
+@app.route('/jobs/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_jobs(id):
+    form = JobForm()
+    if request.method == "GET":
+        session = db_session.create_session()
+        if str(current_user.id) == '1':
+            jobs = session.query(Jobs).filter(Jobs.id == id).first()
+        else:
+            jobs = session.query(Jobs).filter(Jobs.id == id,
+                                              Jobs.team_leader == current_user.id).first()
+        if jobs:
+            form.job.data = jobs.job
+            form.work_size.data = jobs.work_size
+            form.collaborators.data = jobs.collaborators
+            form.is_finished.data = jobs.is_finished
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        if str(current_user.id) == '1':
+            jobs = session.query(Jobs).filter(Jobs.id == id).first()
+        else:
+            jobs = session.query(Jobs).filter(Jobs.id == id,
+                                              Jobs.team_leader == current_user.id).first()
+        if jobs:
+            jobs.job = form.job.data
+            jobs.work_size = form.work_size.data
+            jobs.collaborators = form.collaborators.data
+            jobs.is_finished = form.is_finished.data
+            session.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('add_job.html', title='Редактирование работы',
+                           form=form, name='Редактирование')
 
 
 @app.route('/logout')
