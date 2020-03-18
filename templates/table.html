@@ -2,7 +2,7 @@
 
 {% block content_table %}
 
-        {% for user in users%}
+        {% for job in jobs%}
 
 <table class="table">
 
@@ -18,13 +18,26 @@
             <tbody>
                 <tr>
                     <th scope="row"></th>
-                    {% for elem in user %}
-                        <td>{{ elem }}</td>
-                    {% endfor %}
+                        <td>{{ job.job }}</td>
+                    {% for user in users%}
+                    {%if user.id == job.team_leader%}
+                    <td>{{ user.name }} {{user.surname}}</td>
+                    {%endif%}
+                    {%endfor%}
+                    <td>{{ job.work_size }}</td>
+                    <td>{{ job.collaborators }}</td>
+                    <td>{{ job.is_finished }}</td>
+
                 </tr>
             </tbody>
 
         </table>
+{% if current_user.is_authenticated and current_user.id == job.team_leader %}
+    <div>
+        <a href="/jobs/{{ job.id }}" class="btn btn-warning">Изменить</a>
+        <a href="/jobs_delete/{{ job.id }}" class="btn btn-danger">Удалить</a>
+    </div>
+{% endif %}
         {% endfor %}
 
 {% endblock %}

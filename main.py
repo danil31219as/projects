@@ -43,8 +43,9 @@ def load_user(user_id):
 def start():
     session = db_session.create_session()
     if current_user.is_authenticated:
-        search = session.query(Jobs).all()
-        param = get_params(search)
+        param = {}
+        param['jobs'] = session.query(Jobs).all()
+        param['users'] = session.query(User).all()
         param['title'] = 'Личный кабинет'
         param['text'] = 'Jobs'
 
@@ -124,23 +125,6 @@ def add_job():
                            text='Наше приложение', name='Добавление')
 
 
-def get_params(search):
-    param = {}
-    param['users'] = []
-    session = db_session.create_session()
-    for job in search:
-        user_list = []
-        user_list.append(job.job)
-        user = session.query(User).filter(User.id == job.team_leader).first()
-        user_list.append(user.name)
-        user_list.append(job.work_size)
-        user_list.append(job.collaborators)
-        user_list.append(
-            'is finished' if job.is_finished else 'is not finished')
-        param['users'].append(user_list)
-    return param
-
-
 @app.route('/jobs/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_jobs(id):
@@ -177,6 +161,24 @@ def edit_jobs(id):
             abort(404)
     return render_template('add_job.html', title='Редактирование работы',
                            form=form, name='Редактирование')
+
+
+@app.route('/jobs_delete/<int:id>')
+@login_required
+def delete_jobs(id):
+    session = db_session.create_session()
+    if str(current_user.id) == '1':
+        jobs = session.query(Jobs).filter(Jobs.id == id).first()
+    else:
+        jobs = session.query(Jobs).filter(Jobs.id == id,
+                                          Jobs.team_leader == current_user.id).first()
+    if jobs:
+        session.delete(jobs)
+        session.commit()
+        return redirect('/')
+    else:
+        abort(404)
+    return render_template('start.html', title='Личный кабинет')
 
 
 @app.route('/logout')
