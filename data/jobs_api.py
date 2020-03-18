@@ -58,3 +58,14 @@ def create_jobs():
     session.add(jobs)
     session.commit()
     return jsonify({'success': 'OK'})
+
+
+@blueprint.route('/api/jobs/<int:team_leader>', methods=['DELETE'])
+def delete_news(team_leader):
+    session = db_session.create_session()
+    jobs = session.query(Jobs).get(team_leader)
+    if not jobs:
+        return jsonify({'error': 'Not found'})
+    session.delete(jobs)
+    session.commit()
+    return jsonify({'success': 'OK'})
