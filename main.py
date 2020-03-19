@@ -6,6 +6,8 @@ from flask_restful import Api, abort
 from data import db_session, jobs_api
 from flask_login import LoginManager, login_user, logout_user, login_required, \
     current_user
+
+from data.jobs_resource import JobsListResource, JobsResource
 from data.users import User
 from flask import render_template
 from data.login_form import LoginForm
@@ -190,6 +192,8 @@ def logout():
 
 api.add_resource(UsersListResource, '/api/v2/users')
 api.add_resource(UsersResource, '/api/v2/users/<int:user_id>')
+api.add_resource(JobsListResource, '/api/v2/jobs')
+api.add_resource(JobsResource, '/api/v2/jobs/<int:job_id>')
 
 if __name__ == '__main__':
     main()
