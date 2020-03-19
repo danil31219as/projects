@@ -1,6 +1,7 @@
 from requests import post
+import datetime
 
-print(post('http://localhost:5000/api/users',
+print(post('http://localhost:5000/api/v2/users',
            json={'id':2,
                'name': 'tester',
                  'surname': 'abc',
@@ -10,6 +11,6 @@ print(post('http://localhost:5000/api/users',
                  'address': 'street',
                  'email': 'test@test',
                  'hashed_password': '12345',
-'modified_date': '01.01.01'
+'modified_date': datetime.datetime.now()
                  }).json())
 

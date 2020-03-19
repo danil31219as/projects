@@ -1,6 +1,5 @@
 import datetime
 
-import flask
 from flask import Flask, jsonify, make_response, request
 from flask_restful import Api, abort
 
@@ -14,7 +13,7 @@ from flask import redirect
 from data.register_form import RegisterForm
 from data.job_form import JobForm
 from data.jobs import Jobs
-from users_resource import UsersResource, UsersListResource
+from data.users_resource import UsersResource, UsersListResource
 
 
 app = Flask(__name__)
