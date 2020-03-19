@@ -78,22 +78,17 @@ def edit_jobs():
     session = db_session.create_session()
     if not request.json:
         return jsonify({'error': 'Empty request'})
-    elif not any(key in request.json for key in
+    elif not all(key in request.json for key in
                  ['job', 'team_leader', 'work_size', 'is_finished',
                   'collaborators']) or not 'id' in request.json:
         return jsonify({'error': 'Bad request'})
     jobs = session.query(Jobs).filter(Jobs.id == request.json['id']).first()
     if not jobs:
         return jsonify({'error': 'id is not found'})
-    if 'job' in request.json:
-        jobs.job = request.json['job']
-    if 'team_leader' in request.json:
-        jobs.job = request.json['team_leader']
-    if 'work_size' in request.json:
-        jobs.job = request.json['work_size']
-    if 'is_finished' in request.json:
-        jobs.job = request.json['is_finished']
-    if 'collaborators' in request.json:
-        jobs.job = request.json['collaborators']
+    jobs.job = request.json['job']
+    jobs.team_leader = request.json['team_leader']
+    jobs.work_size = request.json['work_size']
+    jobs.is_finished = request.json['is_finished']
+    jobs.collaborators = request.json['collaborators']
     session.commit()
     return jsonify({'success': 'OK'})
