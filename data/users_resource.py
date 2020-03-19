@@ -1,4 +1,4 @@
-
+import datetime
 
 from flask import jsonify
 from flask_restful import abort, Resource
@@ -55,7 +55,7 @@ class UsersListResource(Resource):
             address=args['address'],
             email=args['email'],
             hashed_password=args['hashed_password'],
-            modified_date=args['modified_date']
+            modified_date=datetime.datetime.now()
         )
         session.add(users)
         session.commit()

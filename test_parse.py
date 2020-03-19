@@ -11,6 +11,6 @@ print(post('http://localhost:5000/api/v2/users',
                  'address': 'street',
                  'email': 'test@test',
                  'hashed_password': '12345',
-'modified_date': datetime.datetime.now()
+'modified_date': ''
                  }).json())
 
