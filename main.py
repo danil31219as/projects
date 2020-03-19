@@ -14,12 +14,16 @@ from flask import redirect
 from data.register_form import RegisterForm
 from data.job_form import JobForm
 from data.jobs import Jobs
+from users_resource import UsersResource, UsersListResource
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
 
 
 def main():
@@ -187,6 +191,11 @@ def logout():
     logout_user()
     return redirect("/")
 
+# для списка объектов
+api.add_resource(UsersListResource, '/api/v2/users')
+
+# для одного объекта
+api.add_resource(UsersResource, '/api/v2/users/<int:user_id>')
 
 if __name__ == '__main__':
     main()
