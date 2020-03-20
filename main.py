@@ -3,7 +3,7 @@ import datetime
 from flask import Flask, jsonify, make_response, request
 from flask_restful import Api, abort
 
-from data import db_session, jobs_api
+from data import db_session, jobs_api, users_api
 from flask_login import LoginManager, login_user, logout_user, login_required, \
     current_user
 
@@ -27,6 +27,7 @@ login_manager.init_app(app)
 def main():
     db_session.global_init("db/blogs.sqlite")
     app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
 
     @app.errorhandler(404)
     def not_found(error):
