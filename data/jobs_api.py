@@ -27,13 +27,13 @@ def get_jobs():
 def get_one_jobs(team_leader):
     session = db_session.create_session()
     jobs = session.query(Jobs).get(team_leader)
+    if not jobs:
+        return jsonify({'error': 'Not found'})
     return jsonify(
         {
-            'jobs':
-                [item.to_dict(only=(
-                    'id', 'team_leader', 'job', 'work_size',
+            'jobs': jobs.to_dict(
+                only=('team_leader', 'job', 'work_size',
                     'collaborators', 'start_date', 'end_date', 'is_finished'))
-                    for item in jobs]
         }
     )
 

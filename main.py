@@ -6,7 +6,7 @@ from flask_restful import Api, abort
 from data import db_session, jobs_api, users_api
 from flask_login import LoginManager, login_user, logout_user, login_required, \
     current_user
-
+from requests import get
 from data.jobs_resource import JobsListResource, JobsResource
 from data.users import User
 from flask import render_template
@@ -16,6 +16,7 @@ from data.register_form import RegisterForm
 from data.job_form import JobForm
 from data.jobs import Jobs
 from data.users_resource import UsersResource, UsersListResource
+from data.maps_api import get_coor, create_image
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -92,6 +93,7 @@ def register():
             user.speciality = form.speciality.data
             user.age = form.age.data
             user.address = form.address.data
+            user.city_form = form.city.data
             user.modified_date = datetime.datetime.now()
             session.add(user)
             session.commit()
@@ -182,6 +184,13 @@ def delete_jobs(id):
     else:
         abort(404)
     return render_template('start.html', title='Личный кабинет')
+
+
+@app.route('/users_show/<int:user_id>', methods=['GET', 'POST'])
+def show_city(user_id):
+    search = get('http://localhost:5000/api/users/' + str(user_id)).json()
+    create_image(get_coor(search['users']['city_form']))
+    return render_template('users_show.html', search=search['users'])
 
 
 @app.route('/logout')

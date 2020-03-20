@@ -19,9 +19,10 @@ def get_users():
         {
             'users':
                 [item.to_dict(only=(
-                'id', 'name', 'surname', 'age', 'position', 'speciality',
-                'address', 'email', 'hashed_password', 'modified_date'))
-                 for item in users]
+                    'id', 'name', 'surname', 'age', 'position', 'speciality',
+                    'address', 'email', 'hashed_password', 'modified_date',
+                    'city_form'))
+                    for item in users]
         }
     )
 
@@ -34,14 +35,12 @@ def get_one_users(user_id):
         return jsonify({'error': 'Not found'})
     return jsonify(
         {
-            'jobs':
-                [item.to_dict(only=(
-                    'id', 'name', 'surname', 'age', 'position', 'speciality',
-                'address', 'email', 'hashed_password', 'modified_date'))
-                    for item in users]
+            'users': users.to_dict(
+                only=('name', 'surname', 'age', 'position', 'speciality',
+                    'address', 'email', 'hashed_password', 'modified_date',
+                    'city_form'))
         }
     )
-
 
 
 @blueprint.route('/api/users', methods=['POST'])
@@ -51,7 +50,7 @@ def create_users():
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in
                  ['name', 'surname', 'age', 'position', 'speciality',
-                'address', 'email', 'hashed_password']):
+                  'address', 'email', 'hashed_password', 'city_form']):
         return jsonify({'error': 'Bad request'})
     elif any([user.id == request.json['id'] for user in
               session.query(User).all()]):
@@ -66,6 +65,7 @@ def create_users():
         address=request.json['address'],
         email=request.json['email'],
         hashed_password=request.json['hashed_password'],
+        city_form=request.json['city_form'],
         modified_date=datetime.datetime.now()
     )
     session.add(users)
@@ -91,7 +91,8 @@ def put_users(user_id):
         return jsonify({'error': 'Empty request'})
     elif not all(key in request.json for key in
                  ['name', 'surname', 'age', 'position', 'speciality',
-                'address', 'email', 'hashed_password']) or not 'id' in request.json:
+                  'address', 'email', 'hashed_password',
+                  'city_form']) or not 'id' in request.json:
         return jsonify({'error': 'Bad request'})
     users = session.query(User).filter(User.id == user_id).first()
     if not users:
