@@ -1,0 +1,22 @@
+{
+  "characters": [
+    {
+      "name": "Andy",
+      "surname": "Will",
+      "photo": "/static/img/first.jpg",
+      "speciality": ["research engineer", "pilot", " Builder"]
+    },
+    {
+      "name": "Mark",
+      "surname": "Watny",
+      "photo": "/static/img/second.jpg",
+      "speciality": ["exobiologist", "doctor", " terraforming engineer"]
+    },
+    {
+      "name": "John",
+      "surname": "Scott",
+      "photo": "/static/img/third.jpg",
+      "speciality": ["climatologist", "astrogeologist", " glaciologist"]
+    }
+  ]
+}

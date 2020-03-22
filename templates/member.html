@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+{% set char = param["characters"]|random %}
+<h2>{{char["name"]}} {{char["surname"]}}</h2><br>
+<h3>{{char["speciality"]|sort|join(', ')}}</h3>
+<img src={{char["photo"]}} class="img">
+{% endblock %}
