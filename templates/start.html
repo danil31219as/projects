@@ -2,8 +2,9 @@
 {% block content_start %}
 {% if current_user.is_authenticated %}
     <a class="navbar-brand" href="/logout">{{ current_user.name}}</a>
-<p>Ваш id of team leader: {{current_user.id }}</p>
+<p>Yours id: {{current_user.id }}</p>
     <a class="btn btn-success" href="/add_job">Add job</a>
+<a class="btn btn-success" href="/add_department">Add department</a>
 {% else %}
     <p>
         <a class="btn btn-primary " href="/register">Зарегистрироваться</a>

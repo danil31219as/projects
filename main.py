@@ -15,6 +15,8 @@ from flask import redirect
 from data.register_form import RegisterForm
 from data.job_form import JobForm
 from data.jobs import Jobs
+from data.departments import Departments
+from data.department_form import DepartmentForm
 from data.users_resource import UsersResource, UsersListResource
 from data.maps_api import get_coor, create_image
 
@@ -23,6 +25,7 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+i = 0
 
 
 def main():
@@ -43,19 +46,31 @@ def load_user(user_id):
     return session.query(User).get(user_id)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def start():
+    global i
     session = db_session.create_session()
     if current_user.is_authenticated:
-        param = {}
-        param['jobs'] = session.query(Jobs).all()
-        param['users'] = session.query(User).all()
-        param['title'] = 'Личный кабинет'
-        param['text'] = 'Jobs'
-
-        param['char'] = ['Title of activity', 'Team leader', 'Duration',
+        if request.method == 'POST':
+            i += 1
+        if i % 2 == 0:
+            param = {}
+            param['jobs'] = session.query(Jobs).all()
+            param['users'] = session.query(User).all()
+            param['title'] = 'Личный кабинет'
+            param['text'] = 'Jobs'
+            param['char'] = ['Title of activity', 'Team leader', 'Duration',
                          'List of collaborators', 'Is finished']
-        return render_template('table.html', **param)
+            return render_template('table.html', **param)
+        else:
+            param = {}
+            param['departments'] = session.query(Departments).all()
+            param['users'] = session.query(User).all()
+            param['title'] = 'Личный кабинет'
+            param['text'] = 'Departments'
+            param['char'] = ['Title of department', 'Chief', 'Members',
+                             'Department Email']
+            return render_template('table.html', **param)
     return render_template('start.html', title='Личный кабинет')
 
 
@@ -130,6 +145,28 @@ def add_job():
                            text='Наше приложение', name='Добавление')
 
 
+@app.route('/add_department', methods=['GET', 'POST'])
+def add_department():
+    form = DepartmentForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        if str(current_user.id) == str(form.chief.data):
+            department = Departments()
+            department.members = form.members.data
+            department.chief = form.chief.data
+            department.title = form.title.data
+            department.email = form.email.data
+            session.add(department)
+            session.commit()
+            return redirect("/")
+        return render_template('add_department.html',
+                               message="нет доступа",
+                               form=form, name='Добавление')
+    return render_template('add_department.html', title='Добавление департамента',
+                           form=form,
+                           text='Наше приложение', name='Добавление')
+
+
 @app.route('/jobs/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_jobs(id):
@@ -168,6 +205,42 @@ def edit_jobs(id):
                            form=form, name='Редактирование')
 
 
+@app.route('/departments/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_departments(id):
+    form = DepartmentForm()
+    if request.method == "GET":
+        session = db_session.create_session()
+        if str(current_user.id) == '1':
+            departments = session.query(Departments).filter(Departments.id == id).first()
+        else:
+            departments = session.query(Departments).filter(Departments.id == id,
+                                              Departments.chief == current_user.id).first()
+        if departments:
+            form.members.data = departments.members
+            form.title.data = departments.title
+            form.email.data = departments.email
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        if str(current_user.id) == '1':
+            departments = session.query(Departments).filter(Departments.id == id).first()
+        else:
+            departments = session.query(Departments).filter(Departments.id == id,
+                                              Departments.chief == current_user.id).first()
+        if departments:
+            departments.members = form.members.data
+            departments.title = form.title.data
+            departments.email = form.email.data
+            session.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('add_department.html', title='Редактирование департамента',
+                           form=form, name='Редактирование')
+
+
 @app.route('/jobs_delete/<int:id>')
 @login_required
 def delete_jobs(id):
@@ -179,6 +252,24 @@ def delete_jobs(id):
                                           Jobs.team_leader == current_user.id).first()
     if jobs:
         session.delete(jobs)
+        session.commit()
+        return redirect('/')
+    else:
+        abort(404)
+    return render_template('start.html', title='Личный кабинет')
+
+
+@app.route('/departments_delete/<int:id>')
+@login_required
+def delete_departments(id):
+    session = db_session.create_session()
+    if str(current_user.id) == '1':
+        departments = session.query(Departments).filter(Departments.id == id).first()
+    else:
+        departments = session.query(Departments).filter(Departments.id == id,
+                                          Departments.chief == current_user.id).first()
+    if departments:
+        session.delete(departments)
         session.commit()
         return redirect('/')
     else:

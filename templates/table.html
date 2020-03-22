@@ -1,7 +1,10 @@
 {% extends "start.html" %}
 
 {% block content_table %}
-
+    <form action="/" method="post">
+    <button name="ChangeBtn" type="submit" class="btn btn-primary">Change</button>
+</form>
+{% if text == 'Jobs' %}
         {% for job in jobs%}
 
 <table class="table">
@@ -39,5 +42,42 @@
     </div>
 {% endif %}
         {% endfor %}
+{%else%}
+{% for department in departments%}
 
+<table class="table">
+
+            <h2>Department # {{ loop.index }}</h2>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    {% for c in char %}
+                        <th>{{ c }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"></th>
+                        <td>{{ department.title }}</td>
+                    {% for user in users%}
+                    {%if user.id == department.chief%}
+                    <td>{{ user.name }} {{user.surname}}</td>
+                    {%endif%}
+                    {%endfor%}
+                    <td>{{ department.members }}</td>
+                    <td>{{ department.email }}</td>
+
+                </tr>
+            </tbody>
+
+        </table>
+{% if current_user.is_authenticated and current_user.id == department.chief %}
+    <div>
+        <a href="/departments/{{ department.id }}" class="btn btn-warning">Edit</a>
+        <a href="/departments_delete/{{ department.id }}" class="btn btn-danger">Delete</a>
+    </div>
+{% endif %}
+        {% endfor %}
+{%endif%}
 {% endblock %}
