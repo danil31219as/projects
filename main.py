@@ -7,6 +7,8 @@ from data import db_session, jobs_api, users_api
 from flask_login import LoginManager, login_user, logout_user, login_required, \
     current_user
 from requests import get
+
+from data.category import Category
 from data.jobs_resource import JobsListResource, JobsResource
 from data.users import User
 from flask import render_template
@@ -60,7 +62,7 @@ def start():
             param['title'] = 'Личный кабинет'
             param['text'] = 'Jobs'
             param['char'] = ['Title of activity', 'Team leader', 'Duration',
-                         'List of collaborators', 'Is finished']
+                         'List of collaborators', 'Category', 'Is finished']
             return render_template('table.html', **param)
         else:
             param = {}
@@ -134,6 +136,8 @@ def add_job():
             job.is_finished = form.is_finished.data
             job.start_date = datetime.datetime.now()
             job.end_date = datetime.datetime.now()
+            job.categories.append(Category(name=form.categories.data))
+            print(job.categories, job.categories[0].name)
             session.add(job)
             session.commit()
             return redirect("/")
@@ -251,6 +255,7 @@ def delete_jobs(id):
         jobs = session.query(Jobs).filter(Jobs.id == id,
                                           Jobs.team_leader == current_user.id).first()
     if jobs:
+        jobs.categories.remove(jobs.categories[0])
         session.delete(jobs)
         session.commit()
         return redirect('/')

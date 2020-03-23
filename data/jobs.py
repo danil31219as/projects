@@ -1,6 +1,7 @@
 import datetime
 import sqlalchemy
 from flask_login import UserMixin
+from sqlalchemy import orm
 from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
@@ -18,3 +19,7 @@ class Jobs(SqlAlchemyBase, UserMixin, SerializerMixin):
     start_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
     end_date = sqlalchemy.Column(sqlalchemy.DateTime, nullable=True)
     is_finished = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
+    categories = orm.relation("Category",
+                              secondary="jobs_to_category",
+                              backref="jobs")
+
