@@ -1,6 +1,8 @@
 import datetime
+import os
 
 from flask import Flask, jsonify, make_response, request
+from flask_ngrok import run_with_ngrok
 from flask_restful import Api, abort
 
 from data import db_session, jobs_api, users_api
@@ -28,6 +30,7 @@ api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 i = 0
+run_with_ngrok(app)
 
 
 def main():
@@ -303,4 +306,4 @@ api.add_resource(JobsResource, '/api/v2/jobs/<int:job_id>')
 
 if __name__ == '__main__':
     main()
-    app.run(port=5000, host='127.0.0.1')
+    app.run()
