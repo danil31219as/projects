@@ -30,7 +30,7 @@ api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 i = 0
-run_with_ngrok(app)
+# run_with_ngrok(app)
 
 
 def main():
